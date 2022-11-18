@@ -1,4 +1,6 @@
-const PersonForm = ({name, handleName, setName, number, handleNumber, setNumber, persons, setPersons}) => {
+import personService from "../services/people"
+
+const PersonForm = ({name, handleName, setName, number, handleNumber, setNumber, people, setPeople, handleUpdate}) => {
 
     const addPerson = (event) => {
         event.preventDefault();
@@ -6,21 +8,36 @@ const PersonForm = ({name, handleName, setName, number, handleNumber, setNumber,
         if (name === '' || number === '') {
           alert("Please fill all inputs");
         }
-        else if (persons.find(person => person.name === name)) {
-          alert(`The name ${name} is already added to phonebook`);
+        else if (people.find(person => person.name === name)) {
+          if(window.confirm(`${name} is already added to phonebook, replace the old number with a new one?`)){
+            const person = people.find(person => person.name === name);
+            const personObject = {
+              name: person.name,
+              number: number,
+              id: person.id
+            }
+            handleUpdate(personObject.id, personObject)
+          }
         }
-        else if (persons.find(person => person.number === number)) {
+        else if (people.find(person => person.number === number)) {
           alert(`The number ${number} is already added to phonebook`);
         }
         else {
-          const newPerson = {
+          const currentId = people.length > 0 ? people[people.length - 1].id : 0;
+          const personObject = {
             name: name,
             number: number,
-            id: persons.length + 1
+            id: currentId + 1
           }
-          setPersons(persons.concat(newPerson));
-          setName('');
-          setNumber('');
+          personService.create(personObject)
+          .then(newPerson => {
+            setPeople(people.concat(newPerson));
+            setName('');
+            setNumber('');
+          })
+          .catch(error => {
+            console.log("An error has ocurred at creating a new person", error);
+          })
         }
       }
 

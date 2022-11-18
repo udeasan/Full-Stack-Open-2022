@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import axios from 'axios';
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
+import People from "./components/People";
+import personService from './services/people';
 
 const App = () => {
 
-  const [persons, setPersons] = useState([]);
+  const [people, setPeople] = useState([]);
   
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
@@ -24,12 +24,28 @@ const App = () => {
     setFilterByName(event.target.value)
   }
 
+  const handleDelete = (id) => {
+    personService.deleteOne(id)
+    .then(() => {
+      const newList = people.filter(p => p.id !== id);
+      setPeople(newList);
+    })
+  }
+
+  const handleUpdate = (id, newPerson) => {
+    personService.update(id, newPerson)
+    .then(response => {
+      setPeople(people.map(p => p.id !== id ? p : response));
+      setNewName('');
+      setNewNumber('');
+    })
+  }
+
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => {
-        setPersons(response.data);
-      })
+    personService.getAll()
+    .then(people => {
+      setPeople(people);
+    })
   }, [])
 
   return (
@@ -44,11 +60,12 @@ const App = () => {
         number={newNumber}
         handleNumber={handleNumberChange}
         setNumber={setNewNumber}
-        persons={persons}
-        setPersons={setPersons}
+        people={people}
+        setPeople={setPeople}
+        handleUpdate={handleUpdate}
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filter={filterByName} />
+      <People people={people} filter={filterByName} deleteOne={handleDelete}/>
     </div>
   );
 
