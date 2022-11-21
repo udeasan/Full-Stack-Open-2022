@@ -1,6 +1,4 @@
-import personService from "../services/people"
-
-const PersonForm = ({name, handleName, setName, number, handleNumber, setNumber, people, setPeople, handleUpdate}) => {
+const PersonForm = ({name, handleName, number, handleNumber, people, handleUpdate, handleCreate}) => {
 
     const addPerson = (event) => {
         event.preventDefault();
@@ -29,15 +27,7 @@ const PersonForm = ({name, handleName, setName, number, handleNumber, setNumber,
             number: number,
             id: currentId + 1
           }
-          personService.create(personObject)
-          .then(newPerson => {
-            setPeople(people.concat(newPerson));
-            setName('');
-            setNumber('');
-          })
-          .catch(error => {
-            console.log("An error has ocurred at creating a new person", error);
-          })
+          handleCreate(personObject);
         }
       }
 
