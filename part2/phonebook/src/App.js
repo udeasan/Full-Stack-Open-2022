@@ -56,6 +56,12 @@ const App = () => {
         setMessage({});
       }, 4000);
     })
+    .catch(error => {
+      setMessage({message: error.response.data.error, type: 'error'});
+      setTimeout(() => {
+        setMessage({});
+      }, 4000);
+    })
   }
 
   const handleCreate = (personObject) => {
@@ -70,7 +76,10 @@ const App = () => {
             }, 4000);
           })
           .catch(error => {
-            console.log("An error has ocurred at creating a new person", error);
+            setMessage({message: error.response.data.error, type: 'error'});
+            setTimeout(() => {
+              setMessage({});
+            }, 4000);
           })
   }
 
@@ -78,6 +87,12 @@ const App = () => {
     personService.getAll()
     .then(people => {
       setPeople(people);
+    })
+    .catch(error => {
+      setMessage({message: error.response.data.error, type: 'error'});
+      setTimeout(() => {
+        setMessage({});
+      }, 4000);
     })
   }, [])
 
